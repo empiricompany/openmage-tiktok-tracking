@@ -44,4 +44,4 @@ rm -rf /path/to/openmage/var/cache/*
 
 ## Testing
 
-Install the [TikTok Pixel Helper browser extension](https://chrome.google.com/webstore) to verify events are being tracked correctly.
+Install the [TikTok Pixel Helper browser extension](https://chromewebstore.google.com/detail/aelgobmabdmlfmiblddjfnjodalhidnn?utm_source=item-share-cb) to verify events are being tracked correctly.
