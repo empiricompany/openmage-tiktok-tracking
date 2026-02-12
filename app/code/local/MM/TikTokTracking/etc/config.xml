@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MM_TikTokTracking>
+            <version>1.0.0</version>
+        </MM_TikTokTracking>
+    </modules>
+    
+    <global>
+        <models>
+            <mm_tiktok_tracking>
+                <class>MM_TikTokTracking_Model</class>
+            </mm_tiktok_tracking>
+        </models>
+        
+        <blocks>
+            <mm_tiktok_tracking>
+                <class>MM_TikTokTracking_Block</class>
+            </mm_tiktok_tracking>
+        </blocks>
+        
+        <helpers>
+            <mm_tiktok_tracking>
+                <class>MM_TikTokTracking_Helper</class>
+            </mm_tiktok_tracking>
+        </helpers>
+        
+        <events>
+            <sales_quote_item_save_after>
+                <observers>
+                    <mm_tiktok_tracking>
+                        <class>mm_tiktok_tracking/observer</class>
+                        <method>processItemsAddedOrRemovedFromCart</method>
+                    </mm_tiktok_tracking>
+                </observers>
+            </sales_quote_item_save_after>
+            
+            <sales_quote_item_delete_after>
+                <observers>
+                    <mm_tiktok_tracking>
+                        <class>mm_tiktok_tracking/observer</class>
+                        <method>processItemsAddedOrRemovedFromCart</method>
+                    </mm_tiktok_tracking>
+                </observers>
+            </sales_quote_item_delete_after>
+        </events>
+    </global>
+    
+    <frontend>
+        <layout>
+            <updates>
+                <mm_tiktok_tracking>
+                    <file>mm/tiktok-tracking.xml</file>
+                </mm_tiktok_tracking>
+            </updates>
+        </layout>
+        
+        <events>
+            <checkout_onepage_controller_success_action>
+                <observers>
+                    <mm_tiktok_tracking>
+                        <class>mm_tiktok_tracking/observer</class>
+                        <method>trackOrderSuccess</method>
+                    </mm_tiktok_tracking>
+                </observers>
+            </checkout_onepage_controller_success_action>
+            <checkout_multishipping_controller_success_action>
+                <observers>
+                    <mm_tiktok_tracking>
+                        <class>mm_tiktok_tracking/observer</class>
+                        <method>trackOrderSuccess</method>
+                    </mm_tiktok_tracking>
+                </observers>
+            </checkout_multishipping_controller_success_action>
+        </events>
+    </frontend>
+    
+    <default>
+        <mm_tiktok_tracking>
+            <general>
+                <enabled>0</enabled>
+                <pixel_id></pixel_id>
+            </general>
+            <advanced>
+                <enable_advanced_matching>0</enable_advanced_matching>
+            </advanced>
+        </mm_tiktok_tracking>
+    </default>
+</config>

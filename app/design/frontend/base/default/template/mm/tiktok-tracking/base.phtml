@@ -1,0 +1,26 @@
+<?php
+/**
+ * TikTok Tracking Pixel Template
+ * 
+ * Aligned with Mage_GoogleAnalytics pattern:
+ * - One <script> block
+ * - Base script + Events in same block
+ * 
+ * @var MM_TikTokTracking_Block_Pixel $this
+ */
+?>
+<?php
+/** @var MM_TikTokTracking_Helper_Data $_helper */
+$_helper = $this->helper('mm_tiktok_tracking');
+?>
+<?php if ($_helper->isEnabled()): ?>
+    <?php $_pixelId = $_helper->getPixelId() ?>
+    <?php if ($_pixelId): ?>
+        <!-- BEGIN TIKTOK PIXEL CODE -->
+        <script>
+            <?php echo $this->_getBaseScript($_pixelId) ?>
+            <?php echo $this->_getTikTokEventsScript() ?>
+        </script>
+        <!-- END TIKTOK PIXEL CODE -->
+    <?php endif ?>
+<?php endif ?>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MM_TikTokTracking>
+            <active>true</active>
+            <codePool>local</codePool>
+        </MM_TikTokTracking>
+    </modules>
+</config>

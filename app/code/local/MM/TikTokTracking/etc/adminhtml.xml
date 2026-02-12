@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <mm_tiktok_tracking translate="title" module="mm_tiktok_tracking">
+                                        <title>TikTok Tracking</title>
+                                        <sort_order>1000</sort_order>
+                                    </mm_tiktok_tracking>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

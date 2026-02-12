@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <mm_tiktok_tracking translate="label" module="mm_tiktok_tracking">
+            <label>TikTok Tracking</label>
+            <tab>sales</tab>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            
+            <groups>
+                <general translate="label">
+                    <label>General Settings</label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>Enable TikTok Tracking</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Enable or disable TikTok Pixel tracking on your store.]]></comment>
+                        </enabled>
+                        
+                        <pixel_id translate="label comment">
+                            <label>TikTok Pixel ID</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>required-entry</validate>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Your TikTok Pixel ID (e.g., C123456789). Find it in TikTok Ads Manager → Assets → Events.]]></comment>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </pixel_id>
+                    </fields>
+                </general>
+                
+                <advanced translate="label">
+                    <label>Advanced Features</label>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    
+                    <fields>
+                        <enable_advanced_matching translate="label comment">
+                            <label>Enable Advanced Matching</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Send hashed customer email and phone (SHA-256) to improve match rates. Recommended for better attribution.<br/><strong>Privacy:</strong> Email and phone are hashed client-side before transmission.]]></comment>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </enable_advanced_matching>
+                    </fields>
+                </advanced>
+            </groups>
+        </mm_tiktok_tracking>
+    </sections>
+</config>
