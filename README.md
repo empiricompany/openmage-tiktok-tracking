@@ -21,6 +21,12 @@ Optional Advanced Matching feature sends hashed customer email and phone data fo
 composer require empiricompany/openmage-tiktok-tracking
 ```
 
+### Via Modman
+
+```bash
+modman clone https://github.com/empiricompany/openmage-tiktok-tracking.git
+```
+
 ### Manual Installation
 
 Copy the contents of `app/` folder to your OpenMage installation's `app/` folder:

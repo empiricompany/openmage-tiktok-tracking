@@ -1,0 +1,4 @@
+app/code/local/MM/TikTokTracking/                                    app/code/local/MM/TikTokTracking/
+app/design/frontend/base/default/layout/mm/tiktok-tracking.xml       app/design/frontend/base/default/layout/mm/tiktok-tracking.xml
+app/design/frontend/base/default/template/mm/tiktok-tracking/        app/design/frontend/base/default/template/mm/tiktok-tracking/
+app/etc/modules/MM_TikTokTracking.xml                                app/etc/modules/MM_TikTokTracking.xml
