@@ -5,13 +5,11 @@
  *
  * Intercepts system events to accumulate tracking data in session/registry
  * for Block consumption and JavaScript generation.
- * Pattern: Identical to Mage_GoogleAnalytics_Model_Observer
  */
 class MM_TikTokTracking_Model_Observer
 {
     /**
      * Process items added or removed from cart
-     * Pattern: Identical to Mage_GoogleAnalytics_Model_Observer::processItemsAddedOrRemovedFromCart()
      *
      * Event: sales_quote_item_save_after, sales_quote_item_delete_after
      *

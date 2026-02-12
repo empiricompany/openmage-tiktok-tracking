@@ -4,7 +4,6 @@
  * MM_TikTokTracking Pixel Block
  *
  * Generates TikTok Pixel JavaScript code for various e-commerce events.
- * Follows exact Mage_GoogleAnalytics pattern.
  */
 class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
 {
@@ -43,9 +42,9 @@ TIKTOK;
     }
     
     /**
-     * Get TikTok Pixel events scripts (like GA4's _getEnhancedEcommerceDataForAnalytics4)
+     * Get TikTok Pixel events scripts
      *
-     * Pattern: Build data array, then convert to ttq.track() calls (like GA4)
+     * Build data array, then convert to ttq.track() calls
      *
      * @return string
      */
@@ -75,7 +74,6 @@ TIKTOK;
         $helper = $this->_helper;
         
         // AddToCart event (Session-based) - tracked on any page
-        // TikTok-specific session key (separate from GA4)
         $addedProducts = Mage::getSingleton('core/session')->getAddedProductsForTikTokAnalytics();
         if ($addedProducts) {
             foreach ($addedProducts as $_addedProduct) {
@@ -180,7 +178,7 @@ TIKTOK;
             }
         }
         
-        // Convert result array to ttq.track() calls (like GA4)
+        // Convert result array to ttq.track() calls
         $scripts = '';
         foreach ($result as $event) {
             $eventName = $event[0];

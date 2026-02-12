@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <layout>
-    <!-- TikTok Tracking: Base + Events (all pages) -->
     <default>
         <reference name="head">
             <block type="mm_tiktok_tracking/pixel" name="tiktok_tracking" template="mm/tiktok-tracking/base.phtml" />
