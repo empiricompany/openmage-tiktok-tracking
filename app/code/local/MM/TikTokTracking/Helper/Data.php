@@ -11,6 +11,7 @@ class MM_TikTokTracking_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_ENABLED = 'mm_tiktok_tracking/general/enabled';
     const XML_PATH_PIXEL_ID = 'mm_tiktok_tracking/general/pixel_id';
     const XML_PATH_ADVANCED_MATCHING = 'mm_tiktok_tracking/advanced/enable_advanced_matching';
+    const XML_PATH_DEBUG_MODE = 'mm_tiktok_tracking/advanced/debug_mode';
     
     /**
      * Check if module is enabled
@@ -51,6 +52,32 @@ class MM_TikTokTracking_Helper_Data extends Mage_Core_Helper_Abstract
         }
         
         return Mage::getStoreConfigFlag(self::XML_PATH_ADVANCED_MATCHING, $storeId);
+    }
+    
+    /**
+     * Check if Debug Mode is enabled
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isDebugModeEnabled($storeId = null)
+    {
+        if (!$this->isEnabled($storeId)) {
+            return false;
+        }
+        
+        return Mage::getStoreConfigFlag(self::XML_PATH_DEBUG_MODE, $storeId);
+    }
+    
+    /**
+     * Log data to tiktok_tracking.log file
+     *
+     * @param mixed $data
+     * @return void
+     */
+    public function log($data)
+    {
+        Mage::log($data, Zend_Log::DEBUG, 'tiktok_tracking.log');
     }
     
     /**

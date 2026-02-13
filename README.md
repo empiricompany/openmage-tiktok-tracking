@@ -43,10 +43,11 @@ rm -rf /path/to/openmage/var/cache/*
 
 ## Configuration
 
-1. Go to **Admin Panel → System → Configuration → Sales → TikTok Tracking**
+1. Go to **Admin Panel → System → Configuration → TikTok → Tracking**
 2. Enable the module
 3. Enter your TikTok Pixel ID (you can find it in TikTok Ads Manager)
 4. Optionally enable Advanced Matching for better tracking accuracy
+5. Optionally enable Debug Mode to log tracking data
 
 ## Testing
 

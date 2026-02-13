@@ -9,6 +9,26 @@
 class MM_TikTokTracking_Model_Observer
 {
     /**
+     * Add order information into TikTok block to render on checkout success pages
+     *
+     * Event: checkout_onepage_controller_success_action, checkout_multishipping_controller_success_action
+     *
+     * @param Varien_Event_Observer $observer
+     * @return void
+     */
+    public function setTikTokOnOrderSuccessPageView(Varien_Event_Observer $observer)
+    {
+        $orderIds = $observer->getEvent()->getOrderIds();
+        if (empty($orderIds) || !is_array($orderIds)) {
+            return;
+        }
+        $block = Mage::app()->getFrontController()->getAction()->getLayout()->getBlock('tiktok_tracking');
+        if ($block) {
+            $block->setOrderIds($orderIds);
+        }
+    }
+
+    /**
      * Process items added or removed from cart
      *
      * Event: sales_quote_item_save_after, sales_quote_item_delete_after
@@ -69,43 +89,6 @@ class MM_TikTokTracking_Model_Observer
                 $removedProducts[] = $dataForAnalytics;
                 $session->setRemovedProductsForTikTokAnalytics($removedProducts);
             }
-        }
-    }
-
-    /**
-     * Track order success (Purchase event)
-     *
-     * Event: checkout_onepage_controller_success_action, checkout_multishipping_controller_success_action
-     *
-     * @param Varien_Event_Observer $observer
-     * @return void
-     */
-    public function trackOrderSuccess(Varien_Event_Observer $observer)
-    {
-        $orderIds = $observer->getEvent()->getOrderIds();
-        
-        if (empty($orderIds) || !is_array($orderIds)) {
-            return;
-        }
-        
-        $session = Mage::getSingleton('core/session');
-        
-        foreach ($orderIds as $orderId) {
-            $order = Mage::getModel('sales/order')->load($orderId);
-            
-            if (!$order->getId()) {
-                continue;
-            }
-            
-            // Save in session for Block to consume
-            $session->setTikTokPurchaseOrder([
-                'entity_id' => $order->getId(),
-                'increment_id' => $order->getIncrementId(),
-                'grand_total' => $order->getGrandTotal(),
-                'order_currency_code' => $order->getOrderCurrencyCode(),
-                'base_currency_code' => $order->getBaseCurrencyCode(),
-                'customer_email' => $order->getCustomerEmail()
-            ]);
         }
     }
 }

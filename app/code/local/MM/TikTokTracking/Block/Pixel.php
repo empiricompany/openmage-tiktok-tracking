@@ -8,9 +8,22 @@
 class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
 {
     /**
+     * Supported checkout pages for InitiateCheckout event
+     */
+    protected const CHECKOUT_PAGES = [
+        ['module' => 'checkout', 'controller' => 'onepage'],
+        ['module' => 'firecheckout', 'controller' => 'index']
+    ];
+    
+    /**
      * @var MM_TikTokTracking_Helper_Data
      */
     protected $_helper;
+    
+    /**
+     * @var array
+     */
+    protected $_orderIds = [];
     
     /**
      * Constructor
@@ -19,6 +32,28 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
     {
         parent::_construct();
         $this->_helper = Mage::helper('mm_tiktok_tracking');
+    }
+    
+    /**
+     * Set order IDs for Purchase event tracking
+     *
+     * @param array $orderIds
+     * @return $this
+     */
+    public function setOrderIds($orderIds)
+    {
+        $this->_orderIds = $orderIds;
+        return $this;
+    }
+    
+    /**
+     * Get order IDs
+     *
+     * @return array
+     */
+    public function getOrderIds()
+    {
+        return $this->_orderIds;
     }
     
     /**
@@ -70,7 +105,6 @@ TIKTOK;
         $request = $this->getRequest();
         $moduleName = $request->getModuleName();
         $controllerName = $request->getControllerName();
-        $action = $request->getActionName();
         $helper = $this->_helper;
         
         // AddToCart event (Session-based) - tracked on any page
@@ -80,53 +114,73 @@ TIKTOK;
                 $validation = $helper->validateProductData($_addedProduct);
                 if ($validation === true) {
                     $eventData = [
+                        'contents' => [
+                            [
+                                'content_id' => $_addedProduct['sku'],
+                                'content_name' => $_addedProduct['name'],
+                                'quantity' => (int) $_addedProduct['qty'],
+                                'price' => (float)number_format($_addedProduct['price'], 2, '.', '')
+                            ]
+                        ],
                         'content_type' => 'product',
-                        'content_id' => $_addedProduct['sku'],
-                        'content_name' => $_addedProduct['name'],
                         'value' => (float)number_format($_addedProduct['price'] * $_addedProduct['qty'], 2, '.', ''),
-                        'quantity' => (int) $_addedProduct['qty'],
                         'currency' => $_addedProduct['currency']
                     ];
                     $result[] = ['AddToCart', $eventData];
                 }
+                Mage::getSingleton('core/session')->unsAddedProductsForTikTokAnalytics();
             }
-            Mage::getSingleton('core/session')->unsAddedProductsForTikTokAnalytics();
         }
         
         // ViewContent event (Product page)
         if ($moduleName == 'catalog' && $controllerName == 'product') {
-            $productData = $helper->getCurrentProductData();
-            if ($productData) {
-                $validation = $helper->validateProductData($productData);
-                if ($validation === true) {
-                    $eventData = [
-                        'content_type' => 'product',
-                        'content_id' => $productData['sku'],
-                        'content_name' => $productData['name'],
-                        'value' => (float)number_format($productData['price'], 2, '.', ''),
-                        'currency' => $productData['currency']
-                    ];
-                    $result[] = ['ViewContent', $eventData];
-                }
+            $productViewed = Mage::registry('current_product');
+            if ($productViewed && $productViewed->getId()) {
+                $eventData = [
+                    'contents' => [
+                        [
+                            'content_id' => $productViewed->getSku(),
+                            'content_name' => $productViewed->getName(),
+                            'price' => (float)number_format($productViewed->getFinalPrice(), 2, '.', '')
+                        ]
+                    ],
+                    'content_type' => 'product',
+                    'value' => (float)number_format($productViewed->getFinalPrice(), 2, '.', ''),
+                    'currency' => Mage::app()->getStore()->getCurrentCurrencyCode()
+                ];
+                $result[] = ['ViewContent', $eventData];
             }
         }
         
         // InitiateCheckout event (Checkout page)
-        if (($moduleName == 'checkout' && $controllerName == 'onepage') || 
-            ($moduleName == 'firecheckout' && $controllerName == 'index')) {
+        $isCheckoutPage = false;
+        foreach (static::CHECKOUT_PAGES as $page) {
+            if ($moduleName == $page['module'] && $controllerName == $page['controller']) {
+                $isCheckoutPage = true;
+                break;
+            }
+        }
+        
+        if ($isCheckoutPage) {
             $quote = Mage::getSingleton('checkout/session')->getQuote();
             if ($quote && $quote->getId()) {
                 $items = $quote->getAllVisibleItems();
                 if (!empty($items)) {
-                    $contentIds = [];
+                    $contents = [];
                     $value = 0.00;
                     foreach ($items as $item) {
-                        $contentIds[] = $item->getSku();
-                        $value += $item->getBasePriceInclTax() * $item->getQty();
+                        $itemPrice = (float)$item->getBasePriceInclTax();
+                        $contents[] = [
+                            'content_id' => $item->getSku(),
+                            'content_name' => $item->getName(),
+                            'quantity' => (int) $item->getQty(),
+                            'price' => (float)number_format($itemPrice, 2, '.', '')
+                        ];
+                        $value += $itemPrice * $item->getQty();
                     }
                     $eventData = [
-                        'content_type' => 'product_group',
-                        'content_id' => $contentIds,
+                        'contents' => $contents,
+                        'content_type' => 'product',
                         'value' => (float)number_format($value, 2, '.', ''),
                         'currency' => Mage::app()->getStore()->getCurrentCurrencyCode()
                     ];
@@ -135,32 +189,36 @@ TIKTOK;
             }
         }
         
-        // Purchase event (Success page - CRITICAL deduplication)
-        if ($moduleName == 'checkout' && $controllerName == 'onepage' && $action == 'success') {
-            $session = Mage::getSingleton('core/session');
-            $orderData = $session->getTikTokPurchaseOrder();
+        // Purchase event
+        $orderIds = $this->getOrderIds();
+        if (!empty($orderIds) && is_array($orderIds)) {
+            $collection = Mage::getResourceModel('sales/order_collection')
+                ->addFieldToFilter('entity_id', ['in' => $orderIds]);
             
-            if ($orderData && isset($orderData['entity_id'])) {
-                $order = Mage::getModel('sales/order')->load($orderData['entity_id']);
-                if ($order && $order->getId()) {
-                    $contentIds = [];
-                    foreach ($order->getAllVisibleItems() as $item) {
-                        $contentIds[] = $item->getSku();
+            foreach ($collection as $order) {
+                $contents = [];
+                
+                foreach ($order->getAllItems() as $item) {
+                    if ($item->getParentItem()) {
+                        continue;
                     }
-                    
-                    if (!empty($contentIds)) {
-                        $eventData = [
-                            'content_type' => 'product_group',
-                            'content_id' => $contentIds,
-                            'value' => (float)number_format($order->getGrandTotal(), 2, '.', ''),
-                            'currency' => $order->getBaseCurrencyCode(),
-                            'order_id' => $order->getIncrementId()
-                        ];
-                        $result[] = ['Purchase', $eventData];
-                    }
+                    $contents[] = [
+                        'content_id' => $item->getSku(),
+                        'content_name' => $item->getName(),
+                        'quantity' => (int) $item->getQtyOrdered(),
+                        'price' => (float)number_format($item->getBasePrice(), 2, '.', '')
+                    ];
                 }
-                // CRITICAL: Clear session (deduplication)
-                $session->unsTikTokPurchaseOrder();
+                
+                if (!empty($contents)) {
+                    $eventData = [
+                        'contents' => $contents,
+                        'content_type' => 'product',
+                        'value' => (float)number_format($order->getGrandTotal(), 2, '.', ''),
+                        'currency' => $order->getBaseCurrencyCode()
+                    ];
+                    $result[] = ['Purchase', $eventData];
+                }
             }
         }
         
@@ -176,6 +234,10 @@ TIKTOK;
                     $result[] = ['Identify', $identifyData];
                 }
             }
+        }
+        
+        if ($this->helper('mm_tiktok_tracking')->isDebugModeEnabled() && count($result) > 0) {
+            $this->helper('mm_tiktok_tracking')->log($result);
         }
         
         // Convert result array to ttq.track() calls

@@ -5,26 +5,31 @@
             <version>1.0.0</version>
         </MM_TikTokTracking>
     </modules>
-    
     <global>
         <models>
             <mm_tiktok_tracking>
                 <class>MM_TikTokTracking_Model</class>
             </mm_tiktok_tracking>
         </models>
-        
         <blocks>
             <mm_tiktok_tracking>
                 <class>MM_TikTokTracking_Block</class>
             </mm_tiktok_tracking>
         </blocks>
-        
         <helpers>
             <mm_tiktok_tracking>
                 <class>MM_TikTokTracking_Helper</class>
             </mm_tiktok_tracking>
         </helpers>
-        
+    </global>
+    <frontend>
+        <layout>
+            <updates>
+                <mm_tiktok_tracking>
+                    <file>mm/tiktok-tracking.xml</file>
+                </mm_tiktok_tracking>
+            </updates>
+        </layout>
         <events>
             <sales_quote_item_save_after>
                 <observers>
@@ -34,7 +39,6 @@
                     </mm_tiktok_tracking>
                 </observers>
             </sales_quote_item_save_after>
-            
             <sales_quote_item_delete_after>
                 <observers>
                     <mm_tiktok_tracking>
@@ -43,24 +47,11 @@
                     </mm_tiktok_tracking>
                 </observers>
             </sales_quote_item_delete_after>
-        </events>
-    </global>
-    
-    <frontend>
-        <layout>
-            <updates>
-                <mm_tiktok_tracking>
-                    <file>mm/tiktok-tracking.xml</file>
-                </mm_tiktok_tracking>
-            </updates>
-        </layout>
-        
-        <events>
             <checkout_onepage_controller_success_action>
                 <observers>
                     <mm_tiktok_tracking>
                         <class>mm_tiktok_tracking/observer</class>
-                        <method>trackOrderSuccess</method>
+                        <method>setTikTokOnOrderSuccessPageView</method>
                     </mm_tiktok_tracking>
                 </observers>
             </checkout_onepage_controller_success_action>
@@ -68,7 +59,7 @@
                 <observers>
                     <mm_tiktok_tracking>
                         <class>mm_tiktok_tracking/observer</class>
-                        <method>trackOrderSuccess</method>
+                        <method>setTikTokOnOrderSuccessPageView</method>
                     </mm_tiktok_tracking>
                 </observers>
             </checkout_multishipping_controller_success_action>
@@ -83,6 +74,7 @@
             </general>
             <advanced>
                 <enable_advanced_matching>0</enable_advanced_matching>
+                <debug_mode>0</debug_mode>
             </advanced>
         </mm_tiktok_tracking>
     </default>
