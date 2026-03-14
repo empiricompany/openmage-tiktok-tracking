@@ -2,7 +2,7 @@
     "name": "empiricompany/openmage-tiktok-tracking",
     "license": "MIT",
     "type": "magento-module",
-    "description": "Openmage TikTok Tracking",
+    "description": "OpenMage module for TikTok Pixel integration with automatic e-commerce event tracking.",
     "authors": [
         {
             "name": "Tony",
