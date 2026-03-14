@@ -191,12 +191,17 @@ TIKTOK;
         
         // Purchase event
         $orderIds = $this->getOrderIds();
+        $guestEmail = null;
         if (!empty($orderIds) && is_array($orderIds)) {
             $collection = Mage::getResourceModel('sales/order_collection')
                 ->addFieldToFilter('entity_id', ['in' => $orderIds]);
             
             foreach ($collection as $order) {
                 $contents = [];
+
+                if (!$guestEmail && $order->getCustomerEmail()) {
+                    $guestEmail = $order->getCustomerEmail();
+                }
                 
                 foreach ($order->getAllItems() as $item) {
                     if ($item->getParentItem()) {
@@ -222,16 +227,23 @@ TIKTOK;
             }
         }
         
-        // Advanced Matching - add identify calls if enabled
+        // Advanced Matching
         if ($helper->isAdvancedMatchingEnabled() && !empty($result)) {
+            $email = null;
+
             $customer = Mage::getSingleton('customer/session')->getCustomer();
             if ($customer && $customer->getId() && $customer->getEmail()) {
-                $email = $helper->hashEmail($customer->getEmail());
-                if ($email) {
-                    $identifyData = [
-                        'email' => $email
-                    ];
-                    $result[] = ['Identify', $identifyData];
+                $email = $customer->getEmail();
+            }
+
+            if (!$email && $guestEmail) {
+                $email = $guestEmail;
+            }
+
+            if ($email) {
+                $hashedEmail = $helper->hashEmail($email);
+                if ($hashedEmail) {
+                    $result[] = ['Identify', ['email' => $hashedEmail]];
                 }
             }
         }
