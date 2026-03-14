@@ -248,24 +248,44 @@ TIKTOK;
             }
         }
         
-        if ($this->helper('mm_tiktok_tracking')->isDebugModeEnabled() && count($result) > 0) {
+        if (empty($result)) {
+            return '';
+        }
+
+        if ($this->helper('mm_tiktok_tracking')->isDebugModeEnabled()) {
             $this->helper('mm_tiktok_tracking')->log($result);
         }
-        
-        // Convert result array to ttq.track() calls
+
+        // Sort result array so Identify events come before track events
+        usort($result, [$this, '_sortEventsCallback']);
+
+        // Convert result array to ttq calls
         $scripts = '';
         foreach ($result as $event) {
             $eventName = $event[0];
             $eventData = $event[1];
-            
-            // Handle Identify event differently
+
             if ($eventName === 'Identify') {
                 $scripts .= "ttq.identify(" . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             } else {
                 $scripts .= "ttq.track('{$eventName}', " . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             }
         }
-        
+
         return $scripts;
+    }
+
+    /**
+     * Sort callback: Identify events sort before all other events
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function _sortEventsCallback(array $a, array $b)
+    {
+        $aPosition = ($a[0] === 'Identify') ? 0 : 1;
+        $bPosition = ($b[0] === 'Identify') ? 0 : 1;
+        return $aPosition - $bPosition;
     }
 }
