@@ -252,20 +252,20 @@ TIKTOK;
             $this->helper('mm_tiktok_tracking')->log($result);
         }
         
-        // Convert result array to ttq.track() calls
-        $scripts = '';
+        // Convert result array to ttq calls - Identify must come before track events
+        $identifyScripts = '';
+        $trackScripts = '';
         foreach ($result as $event) {
             $eventName = $event[0];
             $eventData = $event[1];
             
-            // Handle Identify event differently
             if ($eventName === 'Identify') {
-                $scripts .= "ttq.identify(" . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
+                $identifyScripts .= "ttq.identify(" . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             } else {
-                $scripts .= "ttq.track('{$eventName}', " . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
+                $trackScripts .= "ttq.track('{$eventName}', " . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             }
         }
         
-        return $scripts;
+        return $identifyScripts . $trackScripts;
     }
 }
