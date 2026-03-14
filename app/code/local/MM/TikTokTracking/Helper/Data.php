@@ -77,7 +77,9 @@ class MM_TikTokTracking_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function log($data)
     {
-        Mage::log($data, Zend_Log::DEBUG, 'tiktok_tracking.log');
+        // Zend_Log::DEBUG is available in OpenMage, Mage::LOG_DEBUG in Maho
+        $level = defined('Zend_Log::DEBUG') ? Zend_Log::DEBUG : Mage::LOG_DEBUG;
+        Mage::log($data, $level, 'tiktok_tracking.log');
     }
     
     /**
