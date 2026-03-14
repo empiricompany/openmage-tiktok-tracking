@@ -251,7 +251,11 @@ TIKTOK;
         if ($this->helper('mm_tiktok_tracking')->isDebugModeEnabled() && count($result) > 0) {
             $this->helper('mm_tiktok_tracking')->log($result);
         }
-        
+
+        if (empty($result)) {
+            return '';
+        }
+
         // Sort result array so Identify events come before track events
         usort($result, [$this, '_sortEventsCallback']);
 
