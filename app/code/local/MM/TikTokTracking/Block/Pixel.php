@@ -252,20 +252,36 @@ TIKTOK;
             $this->helper('mm_tiktok_tracking')->log($result);
         }
         
-        // Convert result array to ttq calls - Identify must come before track events
-        $identifyScripts = '';
-        $trackScripts = '';
+        // Sort result array so Identify events come before track events
+        usort($result, [$this, '_sortEventsCallback']);
+
+        // Convert result array to ttq calls
+        $scripts = '';
         foreach ($result as $event) {
             $eventName = $event[0];
             $eventData = $event[1];
-            
+
             if ($eventName === 'Identify') {
-                $identifyScripts .= "ttq.identify(" . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
+                $scripts .= "ttq.identify(" . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             } else {
-                $trackScripts .= "ttq.track('{$eventName}', " . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
+                $scripts .= "ttq.track('{$eventName}', " . json_encode($eventData, JSON_THROW_ON_ERROR) . ");" . "\n";
             }
         }
-        
-        return $identifyScripts . $trackScripts;
+
+        return $scripts;
+    }
+
+    /**
+     * Sort callback: Identify events sort before all other events
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function _sortEventsCallback(array $a, array $b)
+    {
+        $aPosition = ($a[0] === 'Identify') ? 0 : 1;
+        $bPosition = ($b[0] === 'Identify') ? 0 : 1;
+        return $aPosition - $bPosition;
     }
 }
