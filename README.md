@@ -11,7 +11,7 @@ This module automatically tracks e-commerce events on your OpenMage store and se
 - **InitiateCheckout**: Tracks when customers start the checkout process
 - **Purchase**: Tracks completed orders
 
-Optional Advanced Matching feature sends hashed customer email and phone data for improved tracking accuracy.
+Optional Advanced Matching feature sends hashed customer email data for improved tracking accuracy.
 
 ## Installation
 
