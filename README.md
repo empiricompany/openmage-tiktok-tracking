@@ -2,6 +2,8 @@
 
 OpenMage module for TikTok Pixel integration with automatic e-commerce event tracking.
 
+> **Platform compatibility**: this module is compatible with both [OpenMage](https://www.openmage.org/) and [MahoCommerce](https://mahocommerce.com/).
+
 ## What It Does
 
 This module automatically tracks e-commerce events on your OpenMage store and sends them to TikTok Pixel:
