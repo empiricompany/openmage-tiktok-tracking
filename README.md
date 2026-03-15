@@ -1,4 +1,6 @@
 # OpenMage TikTok Tracking Extension
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/empiricompany/openmage-tiktok-tracking.svg?style=flat-square)](https://packagist.org/packages/empiricompany/openmage-tiktok-tracking)
+[![Total Downloads](https://img.shields.io/packagist/dt/empiricompany/openmage-tiktok-tracking.svg?style=flat-square)](https://packagist.org/packages/empiricompany/openmage-tiktok-tracking)
 
 OpenMage module for TikTok Pixel integration with automatic e-commerce event tracking.
 
