@@ -15,7 +15,7 @@
       "openmage"
     ],
     "require": {
-        "php": ">=8.0 <8.5",
+        "php": ">=7.4",
         "magento-hackathon/magento-composer-installer": "*"
     },
     "extra": {
