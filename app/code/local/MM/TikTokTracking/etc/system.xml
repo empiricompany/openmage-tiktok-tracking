@@ -6,7 +6,7 @@
             <sort_order>900</sort_order>
         </mm_tiktok>
     </tabs>
-    
+
     <sections>
         <mm_tiktok_tracking translate="label" module="mm_tiktok_tracking">
             <label>TikTok Ads Pixel</label>
@@ -15,7 +15,7 @@
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
-            
+
             <groups>
                 <general translate="label">
                     <label>General Settings</label>
@@ -23,7 +23,7 @@
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    
+
                     <fields>
                         <enabled translate="label comment">
                             <label>Enable TikTok Tracking</label>
@@ -35,7 +35,7 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Enable or disable TikTok Pixel tracking on your store.]]></comment>
                         </enabled>
-                        
+
                         <pixel_id translate="label comment">
                             <label>TikTok Pixel ID</label>
                             <frontend_type>text</frontend_type>
@@ -51,14 +51,14 @@
                         </pixel_id>
                     </fields>
                 </general>
-                
+
                 <advanced translate="label">
                     <label>Advanced Features</label>
                     <sort_order>20</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    
+
                     <fields>
                         <enable_advanced_matching translate="label comment">
                             <label>Enable Advanced Matching</label>
@@ -69,11 +69,8 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Send hashed customer email and phone (SHA-256) to improve match rates. Recommended for better attribution.<br/><strong>Privacy:</strong> Email and phone are hashed client-side before transmission.]]></comment>
-                            <depends>
-                                <enabled>1</enabled>
-                            </depends>
                         </enable_advanced_matching>
-                        
+
                         <debug_mode translate="label comment">
                             <label>Enable Debug Mode</label>
                             <frontend_type>select</frontend_type>
@@ -83,9 +80,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Log all TikTok events data to var/log/tiktok_tracking.log for debugging purposes.]]></comment>
-                            <depends>
-                                <enabled>1</enabled>
-                            </depends>
                         </debug_mode>
                     </fields>
                 </advanced>
