@@ -14,17 +14,17 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
         ['module' => 'checkout', 'controller' => 'onepage'],
         ['module' => 'firecheckout', 'controller' => 'index']
     ];
-    
+
     /**
      * @var MM_TikTokTracking_Helper_Data
      */
     protected $_helper;
-    
+
     /**
      * @var array
      */
     protected $_orderIds = [];
-    
+
     /**
      * Constructor
      */
@@ -33,7 +33,7 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
         parent::_construct();
         $this->_helper = Mage::helper('mm_tiktok_tracking');
     }
-    
+
     /**
      * Set order IDs for Purchase event tracking
      *
@@ -45,7 +45,7 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
         $this->_orderIds = $orderIds;
         return $this;
     }
-    
+
     /**
      * Get order IDs
      *
@@ -55,7 +55,7 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
     {
         return $this->_orderIds;
     }
-    
+
     /**
      * Get TikTok Pixel base script (initialization)
      *
@@ -65,7 +65,7 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
     protected function _getBaseScript($pixelId)
     {
         $pixelId = $this->jsQuoteEscape($pixelId);
-        
+
         return <<<TIKTOK
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
@@ -75,7 +75,7 @@ class MM_TikTokTracking_Block_Pixel extends Mage_Core_Block_Template
 }(window, document, 'ttq');
 TIKTOK;
     }
-    
+
     /**
      * Get TikTok Pixel events scripts
      *
@@ -88,7 +88,7 @@ TIKTOK;
         if (!$this->_helper->isEnabled()) {
             return '';
         }
-        
+
         // Skip event tracking on AJAX requests
         // AJAX requests render full page but only parts are displayed, so don't consume session data
         // Data will be consumed on the actual page view (non-AJAX)
@@ -96,17 +96,17 @@ TIKTOK;
         $isXmlHttpRequest = $this->getRequest()->isXmlHttpRequest();
         $isAlpineRequest = $this->getRequest()->getHeader('X-Alpine-Request');
         $isAjax = $isXmlHttpRequest || $isAlpineRequest;
-        
+
         if ($isAjax) {
             return '';
         }
-        
+
         $result = [];
         $request = $this->getRequest();
         $moduleName = $request->getModuleName();
         $controllerName = $request->getControllerName();
         $helper = $this->_helper;
-        
+
         // AddToCart event (Session-based) - tracked on any page
         $addedProducts = Mage::getSingleton('core/session')->getAddedProductsForTikTokAnalytics();
         if ($addedProducts) {
@@ -131,27 +131,28 @@ TIKTOK;
                 Mage::getSingleton('core/session')->unsAddedProductsForTikTokAnalytics();
             }
         }
-        
+
         // ViewContent event (Product page)
         if ($moduleName == 'catalog' && $controllerName == 'product') {
             $productViewed = Mage::registry('current_product');
             if ($productViewed && $productViewed->getId()) {
+                $priceInclTax = (float) Mage::helper('tax')->getPrice($productViewed, $productViewed->getFinalPrice(), true);
                 $eventData = [
                     'contents' => [
                         [
                             'content_id' => $productViewed->getSku(),
                             'content_name' => $productViewed->getName(),
-                            'price' => (float)number_format($productViewed->getFinalPrice(), 2, '.', '')
+                            'price' => (float)number_format($priceInclTax, 2, '.', '')
                         ]
                     ],
                     'content_type' => 'product',
-                    'value' => (float)number_format($productViewed->getFinalPrice(), 2, '.', ''),
+                    'value' => (float)number_format($priceInclTax, 2, '.', ''),
                     'currency' => Mage::app()->getStore()->getCurrentCurrencyCode()
                 ];
                 $result[] = ['ViewContent', $eventData];
             }
         }
-        
+
         // InitiateCheckout event (Checkout page)
         $isCheckoutPage = false;
         foreach (static::CHECKOUT_PAGES as $page) {
@@ -160,7 +161,7 @@ TIKTOK;
                 break;
             }
         }
-        
+
         if ($isCheckoutPage) {
             $quote = Mage::getSingleton('checkout/session')->getQuote();
             if ($quote && $quote->getId()) {
@@ -169,9 +170,11 @@ TIKTOK;
                     $contents = [];
                     $value = 0.00;
                     foreach ($items as $item) {
-                        $itemPrice = (float)$item->getBasePriceInclTax();
+                        $itemPrice = (float)$item->getPriceInclTax();
+                        $product = $item->getProduct();
+                        $sku = ($product && $product->getId()) ? $product->getSku() : $item->getSku();
                         $contents[] = [
-                            'content_id' => $item->getSku(),
+                            'content_id' => $sku,
                             'content_name' => $item->getName(),
                             'quantity' => (int) $item->getQty(),
                             'price' => (float)number_format($itemPrice, 2, '.', '')
@@ -188,45 +191,47 @@ TIKTOK;
                 }
             }
         }
-        
+
         // Purchase event
         $orderIds = $this->getOrderIds();
         $guestEmail = null;
         if (!empty($orderIds) && is_array($orderIds)) {
             $collection = Mage::getResourceModel('sales/order_collection')
                 ->addFieldToFilter('entity_id', ['in' => $orderIds]);
-            
+
             foreach ($collection as $order) {
                 $contents = [];
 
                 if (!$guestEmail && $order->getCustomerEmail()) {
                     $guestEmail = $order->getCustomerEmail();
                 }
-                
+
                 foreach ($order->getAllItems() as $item) {
                     if ($item->getParentItem()) {
                         continue;
                     }
+                    $product = $item->getProduct();
+                    $sku = ($product && $product->getId()) ? $product->getSku() : $item->getSku();
                     $contents[] = [
-                        'content_id' => $item->getSku(),
+                        'content_id' => $sku,
                         'content_name' => $item->getName(),
                         'quantity' => (int) $item->getQtyOrdered(),
-                        'price' => (float)number_format($item->getBasePrice(), 2, '.', '')
+                        'price' => (float)number_format($item->getBasePriceInclTax(), 2, '.', '')
                     ];
                 }
-                
+
                 if (!empty($contents)) {
                     $eventData = [
                         'contents' => $contents,
                         'content_type' => 'product',
-                        'value' => (float)number_format($order->getGrandTotal(), 2, '.', ''),
+                        'value' => (float)number_format($order->getBaseGrandTotal(), 2, '.', ''),
                         'currency' => $order->getBaseCurrencyCode()
                     ];
                     $result[] = ['Purchase', $eventData];
                 }
             }
         }
-        
+
         // Advanced Matching
         if ($helper->isAdvancedMatchingEnabled() && !empty($result)) {
             $email = null;
@@ -247,7 +252,7 @@ TIKTOK;
                 }
             }
         }
-        
+
         if (empty($result)) {
             return '';
         }

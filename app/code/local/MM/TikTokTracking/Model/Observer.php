@@ -75,7 +75,7 @@ class MM_TikTokTracking_Model_Observer
                 'sku' => $product->getSku(),
                 'name' => $product->getName(),
                 'qty' => $addedQty ?: $removedQty,
-                'price' => $product->getFinalPrice(),
+                'price' => $item->getPriceInclTax() ?? Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), true),
                 'currency' => Mage::app()->getStore()->getCurrentCurrencyCode()
             ];
 
