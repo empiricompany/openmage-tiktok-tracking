@@ -171,8 +171,7 @@ TIKTOK;
                     $value = 0.00;
                     foreach ($items as $item) {
                         $itemPrice = (float)$item->getPriceInclTax();
-                        $product = $item->getProduct();
-                        $sku = ($product && $product->getId()) ? $product->getSku() : $item->getSku();
+                        $sku = $helper->getTrackingSku($item->getProduct()) ?: $item->getSku();
                         $contents[] = [
                             'content_id' => $sku,
                             'content_name' => $item->getName(),
@@ -210,8 +209,7 @@ TIKTOK;
                     if ($item->getParentItem()) {
                         continue;
                     }
-                    $product = $item->getProduct();
-                    $sku = ($product && $product->getId()) ? $product->getSku() : $item->getSku();
+                    $sku = $helper->getTrackingSku($item->getProduct()) ?: $item->getSku();
                     $contents[] = [
                         'content_id' => $sku,
                         'content_name' => $item->getName(),

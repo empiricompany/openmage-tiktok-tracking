@@ -72,7 +72,7 @@ class MM_TikTokTracking_Model_Observer
         if ($addedQty || $removedQty) {
             $product = $item->getProduct();
             $dataForAnalytics = [
-                'sku' => $product->getSku(),
+                'sku' => Mage::helper('mm_tiktok_tracking')->getTrackingSku($product) ?: $product->getSku(),
                 'name' => $product->getName(),
                 'qty' => $addedQty ?: $removedQty,
                 'price' => $item->getPriceInclTax() ?? Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), true),
